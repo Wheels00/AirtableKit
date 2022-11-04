@@ -37,8 +37,13 @@ public final class Airtable {
     /// - Parameters:
     ///   - tableName: Name of the table to list records from.
     ///   - fields: Names of the fields that should be included in the response.
-    public func list(tableName: String, fields: [String] = []) -> AnyPublisher<[Record], AirtableError> {
-        let queryItems = fields.isEmpty ? nil : fields.map { URLQueryItem(name: "fields[]", value: $0) }
+    public func list(tableName: String, fields: [String] = [], view: String? = nil) -> AnyPublisher<[Record], AirtableError> {
+        
+        
+        var queryItems = fields.isEmpty ? [] : fields.map { URLQueryItem(name: "fields[]", value: $0) }
+        if let v = view {
+            queryItems.append( URLQueryItem(name: "fields[]", value: v) )
+        }
         let request = buildRequest(method: "GET", path: tableName, queryItems: queryItems)
         
         return performRequest(request, decoder: responseDecoder.decodeRecords(data:))
